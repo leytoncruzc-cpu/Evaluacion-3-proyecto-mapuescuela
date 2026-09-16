@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://mapuescuela.org/bpmn">
+
+  <process id="proceso_venta" name="Proceso de Venta Mapuescuela" isExecutable="true">
+
+    <!-- INICIO: se dispara cuando la app crea un pedido -->
+    <startEvent id="start_pedido" name="Pedido creado en la app"/>
+
+    <serviceTask id="task_generar_pedido" name="Generar pedido (Pendiente de pago)"
+                 flowable:delegateExpression="${generarPedidoDelegate}"/>
+
+    <serviceTask id="task_informar_datos" name="Informar datos bancarios al cliente"
+                 flowable:delegateExpression="${informarDatosBancariosDelegate}"/>
+
+    <!-- ESPERA DE COMPROBANTE CON PLAZO 24H -->
+    <userTask id="task_adjuntar_comprobante" name="Adjuntar comprobante de transferencia"
+              flowable:assignee="${clienteId}">
+      <extensionElements>
+        <flowable:formProperty id="urlComprobante" name="URL del comprobante" type="string" required="true"/>
+      </extensionElements>
+    </userTask>
+
+    <boundaryEvent id="timer_24h" name="24 horas" attachedToRef="task_adjuntar_comprobante" cancelActivity="true">
+      <timerEventDefinition>
+        <timeDuration>PT24H</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+
+    <serviceTask id="task_cancelar_vencido" name="Cancelar pedido y liberar stock (vencimiento)"
+                 flowable:delegateExpression="${cancelarPorVencimientoDelegate}"/>
+    <endEvent id="end_cancelado_vencido" name="Pedido cancelado - plazo vencido"/>
+
+    <!-- REVISION Y APROBACION DE PAGO -->
+    <userTask id="task_revisar_comprobante" name="Revisar comprobante de pago"
+              flowable:candidateGroups="voluntarios">
+      <extensionElements>
+        <flowable:formProperty id="pagoAprobado" name="Pago aprobado" type="boolean" required="true"/>
+        <flowable:formProperty id="motivoRechazo" name="Motivo de rechazo (si corresponde)" type="string" required="false"/>
+      </extensionElements>
+    </userTask>
+
+    <exclusiveGateway id="gw_pago_aprobado" name="Pago aprobado?"/>
+
+    <serviceTask id="task_notificar_rechazo" name="Notificar rechazo y cancelar pedido"
+                 flowable:delegateExpression="${notificarRechazoDelegate}"/>
+    <endEvent id="end_cancelado_rechazo" name="Pedido cancelado - pago rechazado"/>
+
+    <serviceTask id="task_actualizar_inventario" name="Actualizar inventario (descontar stock)"
+                 flowable:delegateExpression="${actualizarInventarioDelegate}"/>
+
+    <userTask id="task_preparar_pedido" name="Preparar pedido"
+              flowable:candidateGroups="voluntarios">
+      <extensionElements>
+        <flowable:formProperty id="observacionesPreparacion" name="Observaciones (opcional)" type="string" required="false"/>
+      </extensionElements>
+    </userTask>
+
+    <!-- MODALIDAD DE ENTREGA -->
+    <exclusiveGateway id="gw_modalidad" name="Modalidad de entrega?"/>
+
+    <userTask id="task_listo_retiro" name="Marcar listo para retiro"
+              flowable:candidateGroups="voluntarios">
+      <extensionElements>
+        <flowable:formProperty id="fechaListoRetiro" name="Fecha listo para retiro" type="string" required="false"/>
+      </extensionElements>
+    </userTask>
+    <userTask id="task_registrar_retiro" name="Registrar retiro realizado"
+              flowable:candidateGroups="voluntarios">
+      <extensionElements>
+        <flowable:formProperty id="fechaRetiro" name="Fecha de retiro" type="string" required="true"/>
+      </extensionElements>
+    </userTask>
+    <endEvent id="end_finalizado_retiro" name="Pedido finalizado (retiro)"/>
+
+    <userTask id="task_registrar_despacho" name="Registrar informacion de despacho"
+              flowable:candidateGroups="voluntarios">
+      <extensionElements>
+        <flowable:formProperty id="empresaTransporte" name="Empresa de transporte" type="string" required="true"/>
+        <flowable:formProperty id="numeroSeguimiento" name="Numero de seguimiento" type="string" required="true"/>
+        <flowable:formProperty id="fechaEnvio" name="Fecha de envio" type="string" required="true"/>
+      </extensionElements>
+    </userTask>
+    <userTask id="task_confirmar_entrega" name="Confirmar envio/entrega"
+              flowable:candidateGroups="voluntarios">
+      <extensionElements>
+        <flowable:formProperty id="fechaEntrega" name="Fecha de entrega confirmada" type="string" required="false"/>
+      </extensionElements>
+    </userTask>
+    <endEvent id="end_finalizado_despacho" name="Pedido finalizado (despacho)"/>
+
+    <!-- FLUJOS DE SECUENCIA -->
+    <sequenceFlow id="f1" sourceRef="start_pedido" targetRef="task_generar_pedido"/>
+    <sequenceFlow id="f2" sourceRef="task_generar_pedido" targetRef="task_informar_datos"/>
+    <sequenceFlow id="f3" sourceRef="task_informar_datos" targetRef="task_adjuntar_comprobante"/>
+    <sequenceFlow id="f4" sourceRef="task_adjuntar_comprobante" targetRef="task_revisar_comprobante"/>
+
+    <sequenceFlow id="f_timer" sourceRef="timer_24h" targetRef="task_cancelar_vencido"/>
+    <sequenceFlow id="f5" sourceRef="task_cancelar_vencido" targetRef="end_cancelado_vencido"/>
+
+    <sequenceFlow id="f6" sourceRef="task_revisar_comprobante" targetRef="gw_pago_aprobado"/>
+
+    <sequenceFlow id="f7" sourceRef="gw_pago_aprobado" targetRef="task_notificar_rechazo">
+      <conditionExpression xsi:type="tFormalExpression">${pagoAprobado == false}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="f8" sourceRef="task_notificar_rechazo" targetRef="end_cancelado_rechazo"/>
+
+    <sequenceFlow id="f9" sourceRef="gw_pago_aprobado" targetRef="task_actualizar_inventario">
+      <conditionExpression xsi:type="tFormalExpression">${pagoAprobado == true}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="f10" sourceRef="task_actualizar_inventario" targetRef="task_preparar_pedido"/>
+    <sequenceFlow id="f11" sourceRef="task_preparar_pedido" targetRef="gw_modalidad"/>
+
+    <sequenceFlow id="f12" sourceRef="gw_modalidad" targetRef="task_listo_retiro">
+      <conditionExpression xsi:type="tFormalExpression">${modalidadEntrega == 'retiro'}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="f13" sourceRef="task_listo_retiro" targetRef="task_registrar_retiro"/>
+    <sequenceFlow id="f14" sourceRef="task_registrar_retiro" targetRef="end_finalizado_retiro"/>
+
+    <sequenceFlow id="f15" sourceRef="gw_modalidad" targetRef="task_registrar_despacho">
+      <conditionExpression xsi:type="tFormalExpression">${modalidadEntrega == 'despacho'}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="f16" sourceRef="task_registrar_despacho" targetRef="task_confirmar_entrega"/>
+    <sequenceFlow id="f17" sourceRef="task_confirmar_entrega" targetRef="end_finalizado_despacho"/>
+
+  </process>
+</definitions>

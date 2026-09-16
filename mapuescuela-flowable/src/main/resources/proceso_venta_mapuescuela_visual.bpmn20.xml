@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             targetNamespace="http://mapuescuela.org/bpmn">
+
+  <process id="proceso_venta" name="Proceso de Venta Mapuescuela" isExecutable="true">
+
+    <!-- INICIO: se dispara cuando la app crea un pedido -->
+    <startEvent id="start_pedido" name="Pedido creado en la app"/>
+
+    <serviceTask id="task_generar_pedido" name="Generar pedido (Pendiente de pago)"
+                 flowable:delegateExpression="${generarPedidoDelegate}"/>
+
+    <serviceTask id="task_informar_datos" name="Informar datos bancarios al cliente"
+                 flowable:delegateExpression="${informarDatosBancariosDelegate}"/>
+
+    <!-- ESPERA DE COMPROBANTE CON PLAZO 24H -->
+    <userTask id="task_adjuntar_comprobante" name="Adjuntar comprobante de transferencia"
+              flowable:assignee="${clienteId}"/>
+
+    <boundaryEvent id="timer_24h" name="24 horas" attachedToRef="task_adjuntar_comprobante" cancelActivity="true">
+      <timerEventDefinition>
+        <timeDuration>PT24H</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+
+    <serviceTask id="task_cancelar_vencido" name="Cancelar pedido y liberar stock (vencimiento)"
+                 flowable:delegateExpression="${cancelarPorVencimientoDelegate}"/>
+    <endEvent id="end_cancelado_vencido" name="Pedido cancelado - plazo vencido"/>
+
+    <!-- REVISION Y APROBACION DE PAGO -->
+    <userTask id="task_revisar_comprobante" name="Revisar comprobante de pago"
+              flowable:candidateGroups="voluntarios"/>
+
+    <exclusiveGateway id="gw_pago_aprobado" name="Pago aprobado?"/>
+
+    <serviceTask id="task_notificar_rechazo" name="Notificar rechazo y cancelar pedido"
+                 flowable:delegateExpression="${notificarRechazoDelegate}"/>
+    <endEvent id="end_cancelado_rechazo" name="Pedido cancelado - pago rechazado"/>
+
+    <serviceTask id="task_actualizar_inventario" name="Actualizar inventario (descontar stock)"
+                 flowable:delegateExpression="${actualizarInventarioDelegate}"/>
+
+    <userTask id="task_preparar_pedido" name="Preparar pedido"
+              flowable:candidateGroups="voluntarios"/>
+
+    <!-- MODALIDAD DE ENTREGA -->
+    <exclusiveGateway id="gw_modalidad" name="Modalidad de entrega?"/>
+
+    <userTask id="task_listo_retiro" name="Marcar listo para retiro"
+              flowable:candidateGroups="voluntarios"/>
+    <userTask id="task_registrar_retiro" name="Registrar retiro realizado"
+              flowable:candidateGroups="voluntarios"/>
+    <endEvent id="end_finalizado_retiro" name="Pedido finalizado (retiro)"/>
+
+    <userTask id="task_registrar_despacho" name="Registrar informacion de despacho"
+              flowable:candidateGroups="voluntarios"/>
+    <userTask id="task_confirmar_entrega" name="Confirmar envio/entrega"
+              flowable:candidateGroups="voluntarios"/>
+    <endEvent id="end_finalizado_despacho" name="Pedido finalizado (despacho)"/>
+
+    <!-- FLUJOS DE SECUENCIA -->
+    <sequenceFlow id="f1" sourceRef="start_pedido" targetRef="task_generar_pedido"/>
+    <sequenceFlow id="f2" sourceRef="task_generar_pedido" targetRef="task_informar_datos"/>
+    <sequenceFlow id="f3" sourceRef="task_informar_datos" targetRef="task_adjuntar_comprobante"/>
+    <sequenceFlow id="f4" sourceRef="task_adjuntar_comprobante" targetRef="task_revisar_comprobante"/>
+
+    <sequenceFlow id="f_timer" sourceRef="timer_24h" targetRef="task_cancelar_vencido"/>
+    <sequenceFlow id="f5" sourceRef="task_cancelar_vencido" targetRef="end_cancelado_vencido"/>
+
+    <sequenceFlow id="f6" sourceRef="task_revisar_comprobante" targetRef="gw_pago_aprobado"/>
+
+    <sequenceFlow id="f7" sourceRef="gw_pago_aprobado" targetRef="task_notificar_rechazo">
+      <conditionExpression xsi:type="tFormalExpression">${pagoAprobado == false}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="f8" sourceRef="task_notificar_rechazo" targetRef="end_cancelado_rechazo"/>
+
+    <sequenceFlow id="f9" sourceRef="gw_pago_aprobado" targetRef="task_actualizar_inventario">
+      <conditionExpression xsi:type="tFormalExpression">${pagoAprobado == true}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="f10" sourceRef="task_actualizar_inventario" targetRef="task_preparar_pedido"/>
+    <sequenceFlow id="f11" sourceRef="task_preparar_pedido" targetRef="gw_modalidad"/>
+
+    <sequenceFlow id="f12" sourceRef="gw_modalidad" targetRef="task_listo_retiro">
+      <conditionExpression xsi:type="tFormalExpression">${modalidadEntrega == 'retiro'}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="f13" sourceRef="task_listo_retiro" targetRef="task_registrar_retiro"/>
+    <sequenceFlow id="f14" sourceRef="task_registrar_retiro" targetRef="end_finalizado_retiro"/>
+
+    <sequenceFlow id="f15" sourceRef="gw_modalidad" targetRef="task_registrar_despacho">
+      <conditionExpression xsi:type="tFormalExpression">${modalidadEntrega == 'despacho'}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="f16" sourceRef="task_registrar_despacho" targetRef="task_confirmar_entrega"/>
+    <sequenceFlow id="f17" sourceRef="task_confirmar_entrega" targetRef="end_finalizado_despacho"/>
+
+  </process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="proceso_venta">
+
+      <bpmndi:BPMNShape id="Shape-start_pedido" bpmnElement="start_pedido">
+        <omgdc:Bounds x="42" y="122" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-task_generar_pedido" bpmnElement="task_generar_pedido">
+        <omgdc:Bounds x="150" y="100" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-task_informar_datos" bpmnElement="task_informar_datos">
+        <omgdc:Bounds x="310" y="100" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-task_adjuntar_comprobante" bpmnElement="task_adjuntar_comprobante">
+        <omgdc:Bounds x="470" y="100" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-timer_24h" bpmnElement="timer_24h">
+        <omgdc:Bounds x="502" y="162" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-task_cancelar_vencido" bpmnElement="task_cancelar_vencido">
+        <omgdc:Bounds x="470" y="240" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-end_cancelado_vencido" bpmnElement="end_cancelado_vencido">
+        <omgdc:Bounds x="662" y="262" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Shape-task_revisar_comprobante" bpmnElement="task_revisar_comprobante">
+        <omgdc:Bounds x="630" y="100" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-gw_pago_aprobado" bpmnElement="gw_pago_aprobado" isMarkerVisible="true">
+        <omgdc:Bounds x="815" y="115" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Shape-task_notificar_rechazo" bpmnElement="task_notificar_rechazo">
+        <omgdc:Bounds x="950" y="240" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-end_cancelado_rechazo" bpmnElement="end_cancelado_rechazo">
+        <omgdc:Bounds x="1142" y="262" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Shape-task_actualizar_inventario" bpmnElement="task_actualizar_inventario">
+        <omgdc:Bounds x="950" y="100" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-task_preparar_pedido" bpmnElement="task_preparar_pedido">
+        <omgdc:Bounds x="1110" y="100" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-gw_modalidad" bpmnElement="gw_modalidad" isMarkerVisible="true">
+        <omgdc:Bounds x="1295" y="115" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Shape-task_listo_retiro" bpmnElement="task_listo_retiro">
+        <omgdc:Bounds x="1430" y="100" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-task_registrar_retiro" bpmnElement="task_registrar_retiro">
+        <omgdc:Bounds x="1590" y="100" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-end_finalizado_retiro" bpmnElement="end_finalizado_retiro">
+        <omgdc:Bounds x="1782" y="122" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Shape-task_registrar_despacho" bpmnElement="task_registrar_despacho">
+        <omgdc:Bounds x="1430" y="240" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-task_confirmar_entrega" bpmnElement="task_confirmar_entrega">
+        <omgdc:Bounds x="1590" y="240" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-end_finalizado_despacho" bpmnElement="end_finalizado_despacho">
+        <omgdc:Bounds x="1782" y="262" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="Edge-f1" bpmnElement="f1">
+        <omgdi:waypoint x="78" y="140"/>
+        <omgdi:waypoint x="150" y="140"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge-f2" bpmnElement="f2">
+        <omgdi:waypoint x="250" y="140"/>
+        <omgdi:waypoint x="310" y="140"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge-f3" bpmnElement="f3">
+        <omgdi:waypoint x="410" y="140"/>
+        <omgdi:waypoint x="470" y="140"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge-f4" bpmnElement="f4">
+        <omgdi:waypoint x="570" y="140"/>
+        <omgdi:waypoint x="630" y="140"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Edge-f_timer" bpmnElement="f_timer">
+        <omgdi:waypoint x="520" y="198"/>
+        <omgdi:waypoint x="520" y="240"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge-f5" bpmnElement="f5">
+        <omgdi:waypoint x="570" y="280"/>
+        <omgdi:waypoint x="662" y="280"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Edge-f6" bpmnElement="f6">
+        <omgdi:waypoint x="730" y="140"/>
+        <omgdi:waypoint x="815" y="140"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Edge-f7" bpmnElement="f7">
+        <omgdi:waypoint x="840" y="165"/>
+        <omgdi:waypoint x="840" y="280"/>
+        <omgdi:waypoint x="950" y="280"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge-f8" bpmnElement="f8">
+        <omgdi:waypoint x="1050" y="280"/>
+        <omgdi:waypoint x="1142" y="280"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Edge-f9" bpmnElement="f9">
+        <omgdi:waypoint x="865" y="140"/>
+        <omgdi:waypoint x="950" y="140"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge-f10" bpmnElement="f10">
+        <omgdi:waypoint x="1050" y="140"/>
+        <omgdi:waypoint x="1110" y="140"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge-f11" bpmnElement="f11">
+        <omgdi:waypoint x="1210" y="140"/>
+        <omgdi:waypoint x="1295" y="140"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Edge-f12" bpmnElement="f12">
+        <omgdi:waypoint x="1320" y="140"/>
+        <omgdi:waypoint x="1430" y="140"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge-f13" bpmnElement="f13">
+        <omgdi:waypoint x="1530" y="140"/>
+        <omgdi:waypoint x="1590" y="140"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge-f14" bpmnElement="f14">
+        <omgdi:waypoint x="1690" y="140"/>
+        <omgdi:waypoint x="1782" y="140"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Edge-f15" bpmnElement="f15">
+        <omgdi:waypoint x="1320" y="165"/>
+        <omgdi:waypoint x="1320" y="280"/>
+        <omgdi:waypoint x="1430" y="280"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge-f16" bpmnElement="f16">
+        <omgdi:waypoint x="1530" y="280"/>
+        <omgdi:waypoint x="1590" y="280"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge-f17" bpmnElement="f17">
+        <omgdi:waypoint x="1690" y="280"/>
+        <omgdi:waypoint x="1782" y="280"/>
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+
+</definitions>

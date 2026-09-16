@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             targetNamespace="http://mapuescuela.org/bpmn/asis">
+
+  <collaboration id="collab_venta_asis">
+    <participant id="pool_venta_asis" name="Mapuescuela - Proceso de Venta (AS-IS, manual)" processRef="proceso_venta_asis"/>
+    <participant id="pool_cliente_asis" name="Cliente" processRef="proceso_cliente_asis"/>
+
+    <messageFlow id="mf1" name="Publicacion visible" sourceRef="task_publicar_producto" targetRef="task_ver_publicacion"/>
+    <messageFlow id="mf2" name="Contacto por WhatsApp" sourceRef="task_contactar_voluntario" targetRef="task_confirmar_disponibilidad"/>
+    <messageFlow id="mf3" name="Datos bancarios" sourceRef="task_informar_datos_bancarios" targetRef="task_transferir_dinero"/>
+    <messageFlow id="mf4" name="Comprobante de pago" sourceRef="task_enviar_comprobante" targetRef="task_revisar_comprobante_manual"/>
+    <messageFlow id="mf5" name="Aviso de rechazo" sourceRef="task_avisar_rechazo" targetRef="msg_espera_resultado"/>
+    <messageFlow id="mf6" name="Confirmacion de pago aprobado" sourceRef="task_anotar_venta" targetRef="msg_espera_resultado"/>
+    <messageFlow id="mf7" name="Coordinacion de retiro/despacho" sourceRef="task_coordinar_entrega_voluntario" targetRef="task_coordinar_entrega_cliente"/>
+  </collaboration>
+
+  <!-- PROCESO DE LA ORGANIZACION (Voluntario Mapuescuela) -->
+  <process id="proceso_venta_asis" name="Proceso de Venta - Situacion Actual (Manual)" isExecutable="false">
+
+    <startEvent id="start_publicar" name="Producto disponible para vender"/>
+    <manualTask id="task_publicar_producto" name="Publicar producto (Instagram / boca a boca)"/>
+    <sequenceFlow id="f1" sourceRef="start_publicar" targetRef="task_publicar_producto"/>
+
+    <manualTask id="task_confirmar_disponibilidad" name="Confirmar disponibilidad manualmente"/>
+
+    <manualTask id="task_informar_datos_bancarios" name="Informar datos bancarios por mensaje"/>
+    <sequenceFlow id="f5" sourceRef="task_confirmar_disponibilidad" targetRef="task_informar_datos_bancarios"/>
+
+    <manualTask id="task_revisar_comprobante_manual" name="Revisar comprobante manualmente"/>
+
+    <exclusiveGateway id="gw_pago_valido" name="Pago valido?"/>
+    <sequenceFlow id="f9" sourceRef="task_revisar_comprobante_manual" targetRef="gw_pago_valido"/>
+
+    <manualTask id="task_avisar_rechazo" name="Avisar rechazo por mensaje"/>
+    <sequenceFlow id="f10" name="No" sourceRef="gw_pago_valido" targetRef="task_avisar_rechazo"/>
+    <endEvent id="end_venta_rechazada" name="Venta no concretada"/>
+    <sequenceFlow id="f11" sourceRef="task_avisar_rechazo" targetRef="end_venta_rechazada"/>
+
+    <manualTask id="task_anotar_venta" name="Anotar venta (cuaderno / planilla Excel)"/>
+    <sequenceFlow id="f12" name="Si" sourceRef="gw_pago_valido" targetRef="task_anotar_venta"/>
+
+    <manualTask id="task_coordinar_entrega_voluntario" name="Coordinar retiro o despacho por mensaje"/>
+    <sequenceFlow id="f13" sourceRef="task_anotar_venta" targetRef="task_coordinar_entrega_voluntario"/>
+
+    <manualTask id="task_registrar_entrega_manual" name="Registrar entrega manualmente (si se recuerda)"/>
+    <sequenceFlow id="f15" sourceRef="task_coordinar_entrega_voluntario" targetRef="task_registrar_entrega_manual"/>
+
+    <endEvent id="end_venta_finalizada" name="Venta finalizada"/>
+    <sequenceFlow id="f16" sourceRef="task_registrar_entrega_manual" targetRef="end_venta_finalizada"/>
+
+  </process>
+
+  <!-- PROCESO DEL CLIENTE (entidad externa a la organizacion) -->
+  <process id="proceso_cliente_asis" name="Proceso del Cliente (AS-IS, manual)" isExecutable="false">
+
+    <startEvent id="start_cliente" name="Interesado en el producto"/>
+    <manualTask id="task_ver_publicacion" name="Ver publicacion del producto"/>
+    <sequenceFlow id="c1" sourceRef="start_cliente" targetRef="task_ver_publicacion"/>
+
+    <manualTask id="task_contactar_voluntario" name="Contactar a un voluntario (WhatsApp/mensaje)"/>
+    <sequenceFlow id="c2" sourceRef="task_ver_publicacion" targetRef="task_contactar_voluntario"/>
+
+    <manualTask id="task_transferir_dinero" name="Realizar transferencia bancaria"/>
+    <sequenceFlow id="c3" sourceRef="task_contactar_voluntario" targetRef="task_transferir_dinero"/>
+
+    <manualTask id="task_enviar_comprobante" name="Enviar comprobante (foto por WhatsApp)"/>
+    <sequenceFlow id="c4" sourceRef="task_transferir_dinero" targetRef="task_enviar_comprobante"/>
+
+    <intermediateCatchEvent id="msg_espera_resultado" name="Espera resultado de la revision">
+      <messageEventDefinition/>
+    </intermediateCatchEvent>
+    <sequenceFlow id="c5" sourceRef="task_enviar_comprobante" targetRef="msg_espera_resultado"/>
+
+    <exclusiveGateway id="gw_resultado_cliente" name="Pago aprobado?"/>
+    <sequenceFlow id="c6" sourceRef="msg_espera_resultado" targetRef="gw_resultado_cliente"/>
+
+    <endEvent id="end_cliente_rechazado" name="Compra no concretada"/>
+    <sequenceFlow id="c7" name="No" sourceRef="gw_resultado_cliente" targetRef="end_cliente_rechazado"/>
+
+    <manualTask id="task_coordinar_entrega_cliente" name="Acordar dia/hora de retiro o despacho"/>
+    <sequenceFlow id="c8" name="Si" sourceRef="gw_resultado_cliente" targetRef="task_coordinar_entrega_cliente"/>
+
+    <endEvent id="end_cliente_finalizado" name="Compra finalizada"/>
+    <sequenceFlow id="c9" sourceRef="task_coordinar_entrega_cliente" targetRef="end_cliente_finalizado"/>
+
+  </process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="collab_venta_asis">
+
+      <bpmndi:BPMNShape id="Shape-pool_venta" bpmnElement="pool_venta_asis" isHorizontal="true">
+        <omgdc:Bounds x="40" y="40" width="2180" height="240"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Shape-pool_cliente" bpmnElement="pool_cliente_asis" isHorizontal="true">
+        <omgdc:Bounds x="40" y="340" width="2180" height="240"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Organizacion -->
+      <bpmndi:BPMNShape id="Shape-start_publicar" bpmnElement="start_publicar">
+        <omgdc:Bounds x="72" y="122" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-task_publicar_producto" bpmnElement="task_publicar_producto">
+        <omgdc:Bounds x="160" y="100" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-task_confirmar_disponibilidad" bpmnElement="task_confirmar_disponibilidad">
+        <omgdc:Bounds x="480" y="100" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-task_informar_datos_bancarios" bpmnElement="task_informar_datos_bancarios">
+        <omgdc:Bounds x="640" y="100" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-task_revisar_comprobante_manual" bpmnElement="task_revisar_comprobante_manual">
+        <omgdc:Bounds x="1120" y="100" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-gw_pago_valido" bpmnElement="gw_pago_valido" isMarkerVisible="true">
+        <omgdc:Bounds x="1305" y="115" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-task_anotar_venta" bpmnElement="task_anotar_venta">
+        <omgdc:Bounds x="1420" y="100" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-task_avisar_rechazo" bpmnElement="task_avisar_rechazo">
+        <omgdc:Bounds x="1420" y="200" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-end_venta_rechazada" bpmnElement="end_venta_rechazada">
+        <omgdc:Bounds x="1612" y="222" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-task_coordinar_entrega_voluntario" bpmnElement="task_coordinar_entrega_voluntario">
+        <omgdc:Bounds x="1580" y="100" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-task_registrar_entrega_manual" bpmnElement="task_registrar_entrega_manual">
+        <omgdc:Bounds x="1900" y="100" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-end_venta_finalizada" bpmnElement="end_venta_finalizada">
+        <omgdc:Bounds x="2080" y="122" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Cliente -->
+      <bpmndi:BPMNShape id="Shape-start_cliente" bpmnElement="start_cliente">
+        <omgdc:Bounds x="72" y="422" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-task_ver_publicacion" bpmnElement="task_ver_publicacion">
+        <omgdc:Bounds x="160" y="400" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-task_contactar_voluntario" bpmnElement="task_contactar_voluntario">
+        <omgdc:Bounds x="320" y="400" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-task_transferir_dinero" bpmnElement="task_transferir_dinero">
+        <omgdc:Bounds x="640" y="400" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-task_enviar_comprobante" bpmnElement="task_enviar_comprobante">
+        <omgdc:Bounds x="800" y="400" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-msg_espera_resultado" bpmnElement="msg_espera_resultado">
+        <omgdc:Bounds x="960" y="422" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-gw_resultado_cliente" bpmnElement="gw_resultado_cliente" isMarkerVisible="true">
+        <omgdc:Bounds x="1045" y="415" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-end_cliente_rechazado" bpmnElement="end_cliente_rechazado">
+        <omgdc:Bounds x="1160" y="522" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-task_coordinar_entrega_cliente" bpmnElement="task_coordinar_entrega_cliente">
+        <omgdc:Bounds x="1160" y="400" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape-end_cliente_finalizado" bpmnElement="end_cliente_finalizado">
+        <omgdc:Bounds x="1320" y="422" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Flujos organizacion -->
+      <bpmndi:BPMNEdge id="Edge-f1" bpmnElement="f1">
+        <omgdi:waypoint x="108" y="140"/>
+        <omgdi:waypoint x="160" y="140"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge-f5" bpmnElement="f5">
+        <omgdi:waypoint x="580" y="140"/>
+        <omgdi:waypoint x="640" y="140"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge-f9" bpmnElement="f9">
+        <omgdi:waypoint x="1220" y="140"/>
+        <omgdi:waypoint x="1305" y="140"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge-f10" bpmnElement="f10">
+        <omgdi:waypoint x="1330" y="165"/>
+        <omgdi:waypoint x="1330" y="240"/>
+        <omgdi:waypoint x="1420" y="240"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge-f11" bpmnElement="f11">
+        <omgdi:waypoint x="1520" y="240"/>
+        <omgdi:waypoint x="1612" y="240"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge-f12" bpmnElement="f12">
+        <omgdi:waypoint x="1330" y="115"/>
+        <omgdi:waypoint x="1330" y="80"/>
+        <omgdi:waypoint x="1420" y="80"/>
+        <omgdi:waypoint x="1420" y="140"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge-f13" bpmnElement="f13">
+        <omgdi:waypoint x="1520" y="140"/>
+        <omgdi:waypoint x="1580" y="140"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge-f15" bpmnElement="f15">
+        <omgdi:waypoint x="1680" y="140"/>
+        <omgdi:waypoint x="1900" y="140"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge-f16" bpmnElement="f16">
+        <omgdi:waypoint x="2000" y="140"/>
+        <omgdi:waypoint x="2080" y="140"/>
+      </bpmndi:BPMNEdge>
+
+      <!-- Flujos cliente -->
+      <bpmndi:BPMNEdge id="Edge-c1" bpmnElement="c1">
+        <omgdi:waypoint x="108" y="440"/>
+        <omgdi:waypoint x="160" y="440"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge-c2" bpmnElement="c2">
+        <omgdi:waypoint x="260" y="440"/>
+        <omgdi:waypoint x="320" y="440"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge-c3" bpmnElement="c3">
+        <omgdi:waypoint x="420" y="440"/>
+        <omgdi:waypoint x="640" y="440"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge-c4" bpmnElement="c4">
+        <omgdi:waypoint x="740" y="440"/>
+        <omgdi:waypoint x="800" y="440"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge-c5" bpmnElement="c5">
+        <omgdi:waypoint x="900" y="440"/>
+        <omgdi:waypoint x="960" y="440"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge-c6" bpmnElement="c6">
+        <omgdi:waypoint x="996" y="440"/>
+        <omgdi:waypoint x="1045" y="440"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge-c7" bpmnElement="c7">
+        <omgdi:waypoint x="1070" y="465"/>
+        <omgdi:waypoint x="1070" y="540"/>
+        <omgdi:waypoint x="1160" y="540"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge-c8" bpmnElement="c8">
+        <omgdi:waypoint x="1095" y="440"/>
+        <omgdi:waypoint x="1160" y="440"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge-c9" bpmnElement="c9">
+        <omgdi:waypoint x="1260" y="440"/>
+        <omgdi:waypoint x="1320" y="440"/>
+      </bpmndi:BPMNEdge>
+
+      <!-- Message flows entre pools -->
+      <bpmndi:BPMNEdge id="Edge-mf1" bpmnElement="mf1">
+        <omgdi:waypoint x="210" y="180"/>
+        <omgdi:waypoint x="210" y="400"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge-mf2" bpmnElement="mf2">
+        <omgdi:waypoint x="370" y="400"/>
+        <omgdi:waypoint x="370" y="260"/>
+        <omgdi:waypoint x="530" y="260"/>
+        <omgdi:waypoint x="530" y="180"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge-mf3" bpmnElement="mf3">
+        <omgdi:waypoint x="690" y="180"/>
+        <omgdi:waypoint x="690" y="400"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge-mf4" bpmnElement="mf4">
+        <omgdi:waypoint x="850" y="400"/>
+        <omgdi:waypoint x="850" y="260"/>
+        <omgdi:waypoint x="1170" y="260"/>
+        <omgdi:waypoint x="1170" y="180"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge-mf5" bpmnElement="mf5">
+        <omgdi:waypoint x="1470" y="280"/>
+        <omgdi:waypoint x="1470" y="360"/>
+        <omgdi:waypoint x="900" y="360"/>
+        <omgdi:waypoint x="900" y="440"/>
+        <omgdi:waypoint x="960" y="440"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge-mf6" bpmnElement="mf6">
+        <omgdi:waypoint x="1470" y="180"/>
+        <omgdi:waypoint x="1470" y="300"/>
+        <omgdi:waypoint x="1050" y="300"/>
+        <omgdi:waypoint x="1050" y="440"/>
+        <omgdi:waypoint x="996" y="440"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge-mf7" bpmnElement="mf7">
+        <omgdi:waypoint x="1680" y="140"/>
+        <omgdi:waypoint x="1710" y="140"/>
+        <omgdi:waypoint x="1710" y="380"/>
+        <omgdi:waypoint x="1210" y="380"/>
+        <omgdi:waypoint x="1210" y="400"/>
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+
+</definitions>

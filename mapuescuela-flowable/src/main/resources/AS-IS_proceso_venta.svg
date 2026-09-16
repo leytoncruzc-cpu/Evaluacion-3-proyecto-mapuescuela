@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="2260" height="620" viewBox="0 0 2260 620" font-family="Arial, Helvetica, sans-serif">
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#333"/></marker><marker id="arrow-msg" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#666"/></marker></defs>
+<rect x="0" y="0" width="2260" height="620" fill="white"/>
+<rect x="40.0" y="40.0" width="2180.0" height="240.0" fill="white" stroke="#333" stroke-width="1.5"/>
+<rect x="40.0" y="40.0" width="24" height="240.0" fill="#f5f5f5" stroke="#333" stroke-width="1.5"/>
+<text x="56.0" y="160.0" font-size="13" font-weight="bold" fill="#222" text-anchor="middle" transform="rotate(-90 56.0,160.0)">Mapuescuela - Proceso de Venta (AS-IS, manual)</text>
+<rect x="40.0" y="340.0" width="2180.0" height="240.0" fill="white" stroke="#333" stroke-width="1.5"/>
+<rect x="40.0" y="340.0" width="24" height="240.0" fill="#f5f5f5" stroke="#333" stroke-width="1.5"/>
+<text x="56.0" y="460.0" font-size="13" font-weight="bold" fill="#222" text-anchor="middle" transform="rotate(-90 56.0,460.0)">Cliente</text>
+<path d="M 108.0,140.0 L 160.0,140.0" fill="none" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M 580.0,140.0 L 640.0,140.0" fill="none" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M 1220.0,140.0 L 1305.0,140.0" fill="none" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M 1330.0,165.0 L 1330.0,240.0 L 1420.0,240.0" fill="none" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="1320.6" y="222.0" width="18.8" height="14" fill="white" opacity="0.85"/>
+<text x="1330.0" y="233.0" font-size="11" fill="#444" text-anchor="middle">No</text>
+<path d="M 1520.0,240.0 L 1612.0,240.0" fill="none" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M 1330.0,115.0 L 1330.0,80.0 L 1420.0,80.0 L 1420.0,140.0" fill="none" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="1410.6" y="62.0" width="18.8" height="14" fill="white" opacity="0.85"/>
+<text x="1420.0" y="73.0" font-size="11" fill="#444" text-anchor="middle">Si</text>
+<path d="M 1520.0,140.0 L 1580.0,140.0" fill="none" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M 1680.0,140.0 L 1900.0,140.0" fill="none" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M 2000.0,140.0 L 2080.0,140.0" fill="none" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M 108.0,440.0 L 160.0,440.0" fill="none" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M 260.0,440.0 L 320.0,440.0" fill="none" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M 420.0,440.0 L 640.0,440.0" fill="none" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M 740.0,440.0 L 800.0,440.0" fill="none" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M 900.0,440.0 L 960.0,440.0" fill="none" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M 996.0,440.0 L 1045.0,440.0" fill="none" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M 1070.0,465.0 L 1070.0,540.0 L 1160.0,540.0" fill="none" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="1060.6" y="522.0" width="18.8" height="14" fill="white" opacity="0.85"/>
+<text x="1070.0" y="533.0" font-size="11" fill="#444" text-anchor="middle">No</text>
+<path d="M 1095.0,440.0 L 1160.0,440.0" fill="none" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="1150.6" y="422.0" width="18.8" height="14" fill="white" opacity="0.85"/>
+<text x="1160.0" y="433.0" font-size="11" fill="#444" text-anchor="middle">Si</text>
+<path d="M 1260.0,440.0 L 1320.0,440.0" fill="none" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M 210.0,180.0 L 210.0,400.0" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arrow-msg)"/>
+<circle cx="210.0" cy="180.0" r="4" fill="white" stroke="#777"/>
+<rect x="146.2" y="382.0" width="127.60000000000001" height="14" fill="white" opacity="0.85"/>
+<text x="210.0" y="393.0" font-size="11" fill="#444" text-anchor="middle">Publicacion visible</text>
+<path d="M 370.0,400.0 L 370.0,260.0 L 530.0,260.0 L 530.0,180.0" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arrow-msg)"/>
+<circle cx="370.0" cy="400.0" r="4" fill="white" stroke="#777"/>
+<rect x="459.8" y="242.0" width="140.4" height="14" fill="white" opacity="0.85"/>
+<text x="530.0" y="253.0" font-size="11" fill="#444" text-anchor="middle">Contacto por WhatsApp</text>
+<path d="M 690.0,180.0 L 690.0,400.0" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arrow-msg)"/>
+<circle cx="690.0" cy="180.0" r="4" fill="white" stroke="#777"/>
+<rect x="639.0" y="382.0" width="102.0" height="14" fill="white" opacity="0.85"/>
+<text x="690.0" y="393.0" font-size="11" fill="#444" text-anchor="middle">Datos bancarios</text>
+<path d="M 850.0,400.0 L 850.0,260.0 L 1170.0,260.0 L 1170.0,180.0" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arrow-msg)"/>
+<circle cx="850.0" cy="400.0" r="4" fill="white" stroke="#777"/>
+<rect x="1106.2" y="242.0" width="127.60000000000001" height="14" fill="white" opacity="0.85"/>
+<text x="1170.0" y="253.0" font-size="11" fill="#444" text-anchor="middle">Comprobante de pago</text>
+<path d="M 1470.0,280.0 L 1470.0,360.0 L 900.0,360.0 L 900.0,440.0 L 960.0,440.0" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arrow-msg)"/>
+<circle cx="1470.0" cy="280.0" r="4" fill="white" stroke="#777"/>
+<rect x="845.8" y="342.0" width="108.4" height="14" fill="white" opacity="0.85"/>
+<text x="900.0" y="353.0" font-size="11" fill="#444" text-anchor="middle">Aviso de rechazo</text>
+<path d="M 1470.0,180.0 L 1470.0,300.0 L 1050.0,300.0 L 1050.0,440.0 L 996.0,440.0" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arrow-msg)"/>
+<circle cx="1470.0" cy="180.0" r="4" fill="white" stroke="#777"/>
+<rect x="954.2" y="282.0" width="191.60000000000002" height="14" fill="white" opacity="0.85"/>
+<text x="1050.0" y="293.0" font-size="11" fill="#444" text-anchor="middle">Confirmacion de pago aprobado</text>
+<path d="M 1680.0,140.0 L 1710.0,140.0 L 1710.0,380.0 L 1210.0,380.0 L 1210.0,400.0" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arrow-msg)"/>
+<circle cx="1680.0" cy="140.0" r="4" fill="white" stroke="#777"/>
+<rect x="1607.8" y="362.0" width="204.4" height="14" fill="white" opacity="0.85"/>
+<text x="1710.0" y="373.0" font-size="11" fill="#444" text-anchor="middle">Coordinacion de retiro/despacho</text>
+<circle cx="90.0" cy="140.0" r="18.0" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2"/>
+<text x="90.0" y="172.0" font-size="10.5" fill="#333" text-anchor="middle">Producto</text>
+<text x="90.0" y="184.0" font-size="10.5" fill="#333" text-anchor="middle">disponible para</text>
+<text x="90.0" y="196.0" font-size="10.5" fill="#333" text-anchor="middle">vender</text>
+<rect x="160.0" y="100.0" width="100.0" height="80.0" rx="8" ry="8" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.5"/>
+<text x="210.0" y="126.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">Publicar producto</text>
+<text x="210.0" y="140.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">(Instagram / boca</text>
+<text x="210.0" y="154.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">a boca)</text>
+<rect x="480.0" y="100.0" width="100.0" height="80.0" rx="8" ry="8" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.5"/>
+<text x="530.0" y="126.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">Confirmar</text>
+<text x="530.0" y="140.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">disponibilidad</text>
+<text x="530.0" y="154.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">manualmente</text>
+<rect x="640.0" y="100.0" width="100.0" height="80.0" rx="8" ry="8" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.5"/>
+<text x="690.0" y="126.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">Informar datos</text>
+<text x="690.0" y="140.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">bancarios por</text>
+<text x="690.0" y="154.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">mensaje</text>
+<rect x="1120.0" y="100.0" width="100.0" height="80.0" rx="8" ry="8" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.5"/>
+<text x="1170.0" y="126.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">Revisar</text>
+<text x="1170.0" y="140.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">comprobante</text>
+<text x="1170.0" y="154.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">manualmente</text>
+<polygon points="1330.0,115.0 1355.0,140.0 1330.0,165.0 1305.0,140.0" fill="#fffde7" stroke="#f9a825" stroke-width="2"/>
+<text x="1330.0" y="146.0" font-size="20" fill="#f9a825" text-anchor="middle">X</text>
+<text x="1330.0" y="179.0" font-size="10.5" fill="#8d6e00" text-anchor="middle">Pago valido?</text>
+<rect x="1420.0" y="100.0" width="100.0" height="80.0" rx="8" ry="8" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.5"/>
+<text x="1470.0" y="126.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">Anotar venta</text>
+<text x="1470.0" y="140.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">(cuaderno /</text>
+<text x="1470.0" y="154.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">planilla Excel)</text>
+<rect x="1420.0" y="200.0" width="100.0" height="80.0" rx="8" ry="8" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.5"/>
+<text x="1470.0" y="233.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">Avisar rechazo</text>
+<text x="1470.0" y="247.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">por mensaje</text>
+<circle cx="1630.0" cy="240.0" r="18.0" fill="#ffebee" stroke="#c62828" stroke-width="3"/>
+<text x="1630.0" y="272.0" font-size="10.5" fill="#333" text-anchor="middle">Venta no</text>
+<text x="1630.0" y="284.0" font-size="10.5" fill="#333" text-anchor="middle">concretada</text>
+<rect x="1580.0" y="100.0" width="100.0" height="80.0" rx="8" ry="8" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.5"/>
+<text x="1630.0" y="126.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">Coordinar retiro</text>
+<text x="1630.0" y="140.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">o despacho por</text>
+<text x="1630.0" y="154.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">mensaje</text>
+<rect x="1900.0" y="100.0" width="100.0" height="80.0" rx="8" ry="8" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.5"/>
+<text x="1950.0" y="126.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">Registrar entrega</text>
+<text x="1950.0" y="140.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">manualmente (si</text>
+<text x="1950.0" y="154.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">se recuerda)</text>
+<circle cx="2098.0" cy="140.0" r="18.0" fill="#ffebee" stroke="#c62828" stroke-width="3"/>
+<text x="2098.0" y="172.0" font-size="10.5" fill="#333" text-anchor="middle">Venta finalizada</text>
+<circle cx="90.0" cy="440.0" r="18.0" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2"/>
+<text x="90.0" y="472.0" font-size="10.5" fill="#333" text-anchor="middle">Interesado en el</text>
+<text x="90.0" y="484.0" font-size="10.5" fill="#333" text-anchor="middle">producto</text>
+<rect x="160.0" y="400.0" width="100.0" height="80.0" rx="8" ry="8" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.5"/>
+<text x="210.0" y="433.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">Ver publicacion</text>
+<text x="210.0" y="447.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">del producto</text>
+<rect x="320.0" y="400.0" width="100.0" height="80.0" rx="8" ry="8" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.5"/>
+<text x="370.0" y="426.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">Contactar a un</text>
+<text x="370.0" y="440.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">voluntario</text>
+<text x="370.0" y="454.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">(WhatsApp/mensaje)</text>
+<rect x="640.0" y="400.0" width="100.0" height="80.0" rx="8" ry="8" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.5"/>
+<text x="690.0" y="426.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">Realizar</text>
+<text x="690.0" y="440.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">transferencia</text>
+<text x="690.0" y="454.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">bancaria</text>
+<rect x="800.0" y="400.0" width="100.0" height="80.0" rx="8" ry="8" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.5"/>
+<text x="850.0" y="426.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">Enviar</text>
+<text x="850.0" y="440.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">comprobante (foto</text>
+<text x="850.0" y="454.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">por WhatsApp)</text>
+<circle cx="978.0" cy="440.0" r="18.0" fill="#fff3e0" stroke="#e65100" stroke-width="2"/>
+<circle cx="978.0" cy="440.0" r="14.0" fill="none" stroke="#e65100" stroke-width="1.3"/>
+<rect x="970.0" y="435.0" width="16" height="10" fill="none" stroke="#e65100" stroke-width="1"/>
+<path d="M 970.0,435.0 L 978.0,441.0 L 986.0,435.0" fill="none" stroke="#e65100" stroke-width="1"/>
+<text x="978.0" y="472.0" font-size="10.5" fill="#333" text-anchor="middle">Espera resultado</text>
+<text x="978.0" y="484.0" font-size="10.5" fill="#333" text-anchor="middle">de la revision</text>
+<polygon points="1070.0,415.0 1095.0,440.0 1070.0,465.0 1045.0,440.0" fill="#fffde7" stroke="#f9a825" stroke-width="2"/>
+<text x="1070.0" y="446.0" font-size="20" fill="#f9a825" text-anchor="middle">X</text>
+<text x="1070.0" y="479.0" font-size="10.5" fill="#8d6e00" text-anchor="middle">Pago aprobado?</text>
+<circle cx="1178.0" cy="540.0" r="18.0" fill="#ffebee" stroke="#c62828" stroke-width="3"/>
+<text x="1178.0" y="572.0" font-size="10.5" fill="#333" text-anchor="middle">Compra no</text>
+<text x="1178.0" y="584.0" font-size="10.5" fill="#333" text-anchor="middle">concretada</text>
+<rect x="1160.0" y="400.0" width="100.0" height="80.0" rx="8" ry="8" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.5"/>
+<text x="1210.0" y="426.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">Acordar dia/hora</text>
+<text x="1210.0" y="440.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">de retiro o</text>
+<text x="1210.0" y="454.0" font-size="11.5" fill="#0d3b66" text-anchor="middle">despacho</text>
+<circle cx="1338.0" cy="440.0" r="18.0" fill="#ffebee" stroke="#c62828" stroke-width="3"/>
+<text x="1338.0" y="472.0" font-size="10.5" fill="#333" text-anchor="middle">Compra</text>
+<text x="1338.0" y="484.0" font-size="10.5" fill="#333" text-anchor="middle">finalizada</text>
+<line x1="20" y1="602.0" x2="55" y2="602.0" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="60" y="606.0" font-size="11" fill="#333">Flujo de secuencia</text>
+<line x1="230" y1="602.0" x2="265" y2="602.0" stroke="#777" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arrow-msg)"/>
+<text x="270" y="606.0" font-size="11" fill="#333">Flujo de mensaje</text>
+</svg>
