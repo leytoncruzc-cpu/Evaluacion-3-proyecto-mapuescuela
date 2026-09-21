@@ -24,4 +24,4 @@ flowable:
 
 tomas:
   api:
-    url: http://localhost:8080/api
+    url: https://mapuescuelaapi-production.up.railway.app/api

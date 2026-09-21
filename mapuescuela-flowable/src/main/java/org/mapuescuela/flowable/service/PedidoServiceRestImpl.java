@@ -12,6 +12,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import java.util.HashMap;
+import java.util.Map;
 
 @Primary
 @Service
@@ -47,18 +49,52 @@ public class PedidoServiceRestImpl implements PedidoService {
 
     @Override
     public void cancelarPorVencimiento(String pedidoId) {
-        actualizarEstado(pedidoId, "CANCELADO_VENCIMIENTO");
+        // No existe un endpoint dedicado a "cancelar por vencimiento" en la
+        // API de Tomas. Workaround: usamos el endpoint de RECHAZO de pago,
+        // con una observacion que deja claro el motivo real. Asi el pedido
+        // no queda colgado, aunque en la API quede como PAGO_RECHAZADO y no
+        // como un estado "CANCELADO_VENCIMIENTO" que no existe.
+        String observacion = "Pedido cancelado automáticamente: venció el plazo de 24 horas para el pago.";
+        llamarEndpointPago(pedidoId, "rechazar", observacion);
+        log.info("[Pedido {}] Cancelado por vencimiento (via /pago/rechazar)", pedidoId);
     }
 
     @Override
     public void notificarRechazoYCancelar(String pedidoId, String motivoRechazo) {
-        actualizarEstado(pedidoId, "CANCELADO_PAGO_RECHAZADO");
-        log.info("[Pedido {}] Rechazo notificado. Motivo: {}", pedidoId, motivoRechazo);
+        llamarEndpointPago(pedidoId, "rechazar", motivoRechazo);
+        log.info("[Pedido {}] Rechazo notificado a la API real. Motivo: {}", pedidoId, motivoRechazo);
     }
 
     @Override
     public void actualizarInventario(String pedidoId) {
-        log.info("[Pedido {}] Inventario actualizado (pendiente de endpoint especifico en /api/productos)", pedidoId);
+        // En la API real de Tomás, el stock se descuenta como efecto
+        // secundario de aprobar el pago. Por eso este metodo llama
+        // directamente a /pago/aprobar en vez de tener un endpoint propio.
+        llamarEndpointPago(pedidoId, "aprobar", "Pago aprobado, inventario actualizado automáticamente.");
+        log.info("[Pedido {}] Pago aprobado y stock actualizado en la API real.", pedidoId);
+    }
+    public void aprobarPago(String pedidoId, String observacion) {
+        llamarEndpointPago(pedidoId, "aprobar", observacion == null ? "" : observacion);
+        log.info("[Pedido {}] Pago aprobado en la API real. Stock actualizado automáticamente.", pedidoId);
+    }
+
+    private void llamarEndpointPago(String pedidoId, String accion, String observacion) {
+        String url = baseUrl + "/pedidos/" + pedidoId + "/pago/" + accion;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        Map<String, String> body = new HashMap<>();
+        body.put("observacion", observacion);
+
+        HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
+
+        try {
+            restTemplate.postForObject(url, request, Object.class);
+        } catch (RestClientException e) {
+            log.error("[Pedido {}] Error al llamar /pago/{} en la API de Tomás: {}", pedidoId, accion, e.getMessage());
+            throw new RuntimeException("Error al " + accion + " el pago del pedido " + pedidoId + ": " + e.getMessage(), e);
+        }
     }
 
     private void actualizarEstado(String pedidoId, String nuevoEstado) {
