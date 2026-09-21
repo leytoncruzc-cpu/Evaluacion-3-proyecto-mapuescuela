@@ -19,7 +19,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * marcar cual es el @Primary.
  */
 @Service
-@Primary
 public class PedidoServiceEnMemoriaImpl implements PedidoService {
 
     private static final Logger log = LoggerFactory.getLogger(PedidoServiceEnMemoriaImpl.class);

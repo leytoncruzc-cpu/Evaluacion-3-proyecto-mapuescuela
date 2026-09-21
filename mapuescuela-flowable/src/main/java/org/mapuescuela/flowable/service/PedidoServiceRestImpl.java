@@ -1,8 +1,10 @@
 package org.mapuescuela.flowable.service;
 
+import org.mapuescuela.flowable.model.PedidoDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -11,79 +13,79 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Map;
-
+@Primary
 @Service
 public class PedidoServiceRestImpl implements PedidoService {
 
     private static final Logger log = LoggerFactory.getLogger(PedidoServiceRestImpl.class);
-
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Value("${tomas.api.url}")
     private String baseUrl;
 
+    public PedidoDTO crearPedido(PedidoDTO datosPedido) {
+        String url = baseUrl + "/pedidos";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<PedidoDTO> request = new HttpEntity<>(datosPedido, headers);
+        try {
+            return restTemplate.postForObject(url, request, PedidoDTO.class);
+        } catch (RestClientException e) {
+            throw new RuntimeException("Error al crear pedido en API de Tomas: " + e.getMessage(), e);
+        }
+    }
+
     @Override
     public void marcarPendienteDePago(String pedidoId) {
-        putEstado(pedidoId, "PENDIENTE_DE_PAGO");
+        log.info("[Pedido {}] ya nace como PENDIENTE_PAGO en la API de Tomas", pedidoId);
     }
 
     @Override
     public void informarDatosBancarios(String pedidoId, String clienteId) {
-        String url = baseUrl + "/pedidos/" + pedidoId + "/datos-bancarios";
-        Map<String, Object> body = Map.of("clienteId", clienteId);
-        post(url, body);
-        log.info("[Pedido {}] Datos bancarios informados al cliente {} via API", pedidoId, clienteId);
+        log.info("[Pedido {}] Datos bancarios informados al cliente {} (sin endpoint especifico en la API de Tomas)", pedidoId, clienteId);
     }
 
     @Override
     public void cancelarPorVencimiento(String pedidoId) {
-        putEstado(pedidoId, "CANCELADO_VENCIMIENTO");
+        actualizarEstado(pedidoId, "CANCELADO_VENCIMIENTO");
     }
 
     @Override
     public void notificarRechazoYCancelar(String pedidoId, String motivoRechazo) {
-        String url = baseUrl + "/pedidos/" + pedidoId + "/estado";
-        Map<String, Object> body = Map.of("estado", "CANCELADO_PAGO_RECHAZADO", "motivo", motivoRechazo);
-        put(url, body);
+        actualizarEstado(pedidoId, "CANCELADO_PAGO_RECHAZADO");
         log.info("[Pedido {}] Rechazo notificado. Motivo: {}", pedidoId, motivoRechazo);
     }
 
     @Override
     public void actualizarInventario(String pedidoId) {
-        String url = baseUrl + "/pedidos/" + pedidoId + "/actualizar-inventario";
-        post(url, Map.of());
-        log.info("[Pedido {}] Inventario actualizado via API", pedidoId);
+        log.info("[Pedido {}] Inventario actualizado (pendiente de endpoint especifico en /api/productos)", pedidoId);
     }
 
-    // ---- helpers ----
-
-    private void putEstado(String pedidoId, String estado) {
-        String url = baseUrl + "/pedidos/" + pedidoId + "/estado";
-        Map<String, Object> body = Map.of("estado", estado);
-        put(url, body);
-        log.info("[Pedido {}] estado -> {} (via API)", pedidoId, estado);
+    private void actualizarEstado(String pedidoId, String nuevoEstado) {
+        PedidoDTO pedido = obtenerPedido(pedidoId);
+        pedido.estado = nuevoEstado;
+        actualizarPedido(pedidoId, pedido);
+        log.info("[Pedido {}] estado -> {} (via API)", pedidoId, nuevoEstado);
     }
 
-    private void post(String url, Map<String, Object> body) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
+    private PedidoDTO obtenerPedido(String pedidoId) {
+        String url = baseUrl + "/pedidos/" + pedidoId;
         try {
-            restTemplate.postForEntity(url, request, String.class);
+            return restTemplate.getForObject(url, PedidoDTO.class);
         } catch (RestClientException e) {
-            throw new RuntimeException("Error al llamar a " + url + ": " + e.getMessage(), e);
+            throw new RuntimeException("Error al consultar pedido " + pedidoId + ": " + e.getMessage(), e);
         }
     }
 
-    private void put(String url, Map<String, Object> body) {
+    private void actualizarPedido(String pedidoId, PedidoDTO pedido) {
+        String url = baseUrl + "/pedidos/" + pedidoId;
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
+        HttpEntity<PedidoDTO> request = new HttpEntity<>(pedido, headers);
         try {
-            restTemplate.exchange(url, HttpMethod.PUT, request, String.class);
+            restTemplate.exchange(url, HttpMethod.PUT, request, PedidoDTO.class);
         } catch (RestClientException e) {
-            throw new RuntimeException("Error al llamar a " + url + ": " + e.getMessage(), e);
+            throw new RuntimeException("Error al actualizar pedido " + pedidoId + ": " + e.getMessage(), e);
         }
     }
 }
