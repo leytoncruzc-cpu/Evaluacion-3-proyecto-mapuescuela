@@ -37,8 +37,10 @@ public interface PedidoService {
      */
     void notificarRechazoYCancelar(String pedidoId, String motivoRechazo);
 
+    void actualizarInventario(String pedidoId);
+
     /**
      * Descuenta del stock los productos del pedido, una vez aprobado el pago.
      */
-    void actualizarInventario(String pedidoId);
+    void subirComprobante(String pedidoId, String nombreArchivo, String rutaArchivo, String observacion);
 }

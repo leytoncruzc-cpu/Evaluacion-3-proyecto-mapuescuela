@@ -1,6 +1,7 @@
 package org.mapuescuela.flowable.web;
 
 import org.flowable.engine.TaskService;
+import org.flowable.engine.RuntimeService;
 import org.flowable.task.api.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 
 /**
  * Endpoints para el panel del VOLUNTARIO (lo consume el frontend del
@@ -21,6 +23,9 @@ public class TareasVoluntarioController {
     @Autowired
     private TaskService taskService;
 
+    @Autowired
+    private RuntimeService runtimeService;
+
     /** Lista todas las tareas pendientes para el grupo "voluntarios". */
     @GetMapping("/tareas")
     public List<Map<String, Object>> listarTareasPendientes() {
@@ -32,7 +37,13 @@ public class TareasVoluntarioController {
             Map<String, Object> m = new HashMap<>();
             m.put("taskId", t.getId());
             m.put("nombre", t.getName());
-            m.put("pedidoId", t.getProcessInstanceId()); // usar businessKey en integracion real
+
+            String businessKey = runtimeService.createProcessInstanceQuery()
+                    .processInstanceId(t.getProcessInstanceId())
+                    .singleResult()
+                    .getBusinessKey();
+            m.put("pedidoId", businessKey);
+
             return m;
         }).toList();
     }

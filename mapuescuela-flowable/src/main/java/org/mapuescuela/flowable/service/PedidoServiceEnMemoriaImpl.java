@@ -54,6 +54,11 @@ public class PedidoServiceEnMemoriaImpl implements PedidoService {
         log.info("[Pedido {}] Inventario actualizado (stock descontado)", pedidoId);
     }
 
+    @Override
+    public void subirComprobante(String pedidoId, String nombreArchivo, String rutaArchivo, String observacion) {
+        log.info("[Pedido {}] Comprobante registrado (en memoria): {} - {}", pedidoId, nombreArchivo, rutaArchivo);
+    }
+
     public String consultarEstado(String pedidoId) {
         return estadosPedido.getOrDefault(pedidoId, "DESCONOCIDO");
     }

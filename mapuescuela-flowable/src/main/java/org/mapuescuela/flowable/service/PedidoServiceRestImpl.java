@@ -77,7 +77,28 @@ public class PedidoServiceRestImpl implements PedidoService {
         llamarEndpointPago(pedidoId, "aprobar", observacion == null ? "" : observacion);
         log.info("[Pedido {}] Pago aprobado en la API real. Stock actualizado automáticamente.", pedidoId);
     }
+    @Override
+    public void subirComprobante(String pedidoId, String nombreArchivo, String rutaArchivo, String observacion) {
+        String url = baseUrl + "/pedidos/" + pedidoId + "/comprobante";
 
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        Map<String, String> body = new HashMap<>();
+        body.put("nombreArchivo", nombreArchivo);
+        body.put("rutaArchivo", rutaArchivo);
+        body.put("observacion", observacion == null ? "" : observacion);
+
+        HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
+
+        try {
+            restTemplate.postForObject(url, request, Object.class);
+            log.info("[Pedido {}] Comprobante registrado en la API real: {}", pedidoId, rutaArchivo);
+        } catch (RestClientException e) {
+            log.error("[Pedido {}] Error al registrar comprobante en la API de Tomás: {}", pedidoId, e.getMessage());
+            throw new RuntimeException("Error al registrar comprobante del pedido " + pedidoId + ": " + e.getMessage(), e);
+        }
+    }
     private void llamarEndpointPago(String pedidoId, String accion, String observacion) {
         String url = baseUrl + "/pedidos/" + pedidoId + "/pago/" + accion;
 

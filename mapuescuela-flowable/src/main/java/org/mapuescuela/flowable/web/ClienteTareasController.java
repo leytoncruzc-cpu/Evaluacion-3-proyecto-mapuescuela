@@ -4,6 +4,7 @@ import org.flowable.engine.TaskService;
 import org.flowable.task.api.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.mapuescuela.flowable.service.PedidoServiceRestImpl;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +20,8 @@ public class ClienteTareasController {
 
     @Autowired
     private TaskService taskService;
+    @Autowired
+    private PedidoServiceRestImpl pedidoServiceRest;
 
     public record ComprobanteRequest(String urlComprobante) {}
 
@@ -40,6 +43,10 @@ public class ClienteTareasController {
 
         Map<String, Object> variables = new HashMap<>();
         variables.put("urlComprobante", request.urlComprobante());
+
+        String url = request.urlComprobante();
+        String nombreArchivo = url.substring(url.lastIndexOf('/') + 1);
+        pedidoServiceRest.subirComprobante(pedidoId, nombreArchivo, url, null);
 
         taskService.complete(task.getId(), variables);
 
