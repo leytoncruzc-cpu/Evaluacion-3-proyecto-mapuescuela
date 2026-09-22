@@ -90,11 +90,16 @@ public class PedidoServiceRestImpl implements PedidoService {
 
     @Override
     public void cancelarPorVencimiento(String pedidoId) {
-        // La API no tiene un endpoint de "cancelar por vencimiento". Usamos el
-        // endpoint de rechazo de pago con una observación que indica el motivo real.
-        String observacion = "Pedido cancelado automáticamente: venció el plazo de 24 horas para el pago.";
-        llamarEndpointPago(pedidoId, "rechazar", observacion);
-        log.info("[Pedido {}] Cancelado por vencimiento (vía /pago/rechazar)", pedidoId);
+        // Venció el plazo de 24 horas sin comprobante: el pedido pasa a CANCELADO.
+        // No hay que devolver stock porque recién se descuenta al aprobar el pago.
+        String url = baseUrl + "/pedidos/" + pedidoId + "/cancelar";
+        try {
+            restTemplate.postForObject(url, null, Object.class);
+            log.info("[Pedido {}] Cancelado por vencimiento del plazo de pago", pedidoId);
+        } catch (RestClientException e) {
+            log.error("[Pedido {}] Error al cancelar el pedido en la API: {}", pedidoId, e.getMessage());
+            throw new RuntimeException("Error al cancelar el pedido " + pedidoId + ": " + e.getMessage(), e);
+        }
     }
 
     @Override
