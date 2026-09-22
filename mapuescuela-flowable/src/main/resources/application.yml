@@ -5,10 +5,10 @@ spring:
   application:
     name: mapuescuela-flowable
   datasource:
-    url: jdbc:h2:mem:mapuescuela;DB_CLOSE_DELAY=-1
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: ""
+    url: ${DB_URL:jdbc:h2:mem:mapuescuela;DB_CLOSE_DELAY=-1}
+    driver-class-name: ${DB_DRIVER:org.h2.Driver}
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:}
   h2:
     console:
       enabled: true
@@ -24,4 +24,4 @@ flowable:
 
 tomas:
   api:
-    url: https://mapuescuelaapi-production.up.railway.app/api
+    url: ${TOMAS_API_URL:https://mapuescuelaapi-production.up.railway.app/api}
