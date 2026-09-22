@@ -25,3 +25,12 @@ flowable:
 tomas:
   api:
     url: ${TOMAS_API_URL:https://mapuescuelaapi-production.up.railway.app/api}
+
+mapuescuela:
+  banco:
+    nombre: ${BANCO_NOMBRE:Banco por configurar}
+    tipo-cuenta: ${BANCO_TIPO_CUENTA:Cuenta Vista}
+    numero-cuenta: ${BANCO_NUMERO_CUENTA:000000000}
+    titular: ${BANCO_TITULAR:Mapuescuela}
+    rut: ${BANCO_RUT:11.111.111-1}
+    email: ${BANCO_EMAIL:pagos@mapuescuela.cl}

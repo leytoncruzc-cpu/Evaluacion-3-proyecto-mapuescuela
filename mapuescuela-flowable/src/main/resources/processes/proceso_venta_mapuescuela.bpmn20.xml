@@ -25,7 +25,7 @@
 
     <boundaryEvent id="timer_24h" name="24 horas" attachedToRef="task_adjuntar_comprobante" cancelActivity="true">
       <timerEventDefinition>
-        <timeDuration>PT24H</timeDuration>
+        <timeDuration>PT15S</timeDuration>
       </timerEventDefinition>
     </boundaryEvent>
 

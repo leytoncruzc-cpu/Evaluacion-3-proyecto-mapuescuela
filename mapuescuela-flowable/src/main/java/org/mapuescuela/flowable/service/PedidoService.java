@@ -1,46 +1,47 @@
 package org.mapuescuela.flowable.service;
 
+import java.util.Map;
+
 /**
- * Contrato de integracion entre el proceso BPMN (Flowable) y la logica de negocio
- * real de la aplicacion (base de datos de pedidos, productos, inventario, etc.).
+ * Contrato de integración entre el proceso BPMN (Flowable) y la lógica de negocio
+ * de Mapuescuela. La implementación real es PedidoServiceRestImpl, que se comunica
+ * con la API de pedidos (backend).
  *
- * El Integrante 2 (Backend Developer) debe crear una implementacion real de esta
- * interfaz (por ejemplo PedidoServiceJpaImpl) que reemplace a PedidoServiceEnMemoriaImpl
- * una vez que el modelo de datos y la base de datos esten listos.
- *
- * Los delegates de Flowable (paquete .delegates) solo llaman a estos metodos;
- * no conocen los detalles de persistencia.
+ * Los delegates de Flowable (paquete .delegates) solo llaman a estos métodos;
+ * no conocen los detalles de la API.
  */
 public interface PedidoService {
 
     /**
-     * Marca el pedido con estado "Pendiente de pago".
-     * Se invoca justo despues de crear la instancia del proceso.
+     * Verifica que el pedido exista en la API y esté en estado "Pendiente de pago".
+     * Se invoca justo después de crear la instancia del proceso.
      */
     void marcarPendienteDePago(String pedidoId);
 
     /**
-     * Envia al cliente los datos bancarios de Mapuescuela para realizar la transferencia
-     * (por ejemplo via email, o dejandolos disponibles en la app).
+     * Devuelve los datos bancarios de Mapuescuela para que el cliente haga la
+     * transferencia. El delegate los guarda como variables del proceso para que
+     * la app del cliente los pueda mostrar.
      */
-    void informarDatosBancarios(String pedidoId, String clienteId);
+    Map<String, String> informarDatosBancarios(String pedidoId, String clienteId);
 
     /**
-     * Cancela el pedido por vencimiento del plazo de 24 horas y libera el stock
-     * reservado (los productos vuelven a estar disponibles).
+     * Cancela el pedido por vencimiento del plazo de 24 horas para el pago.
      */
     void cancelarPorVencimiento(String pedidoId);
 
     /**
-     * Registra que el voluntario rechazo el comprobante y notifica al cliente.
-     * El pedido queda cancelado.
+     * Registra que el voluntario rechazó el comprobante. El pedido queda cancelado.
      */
     void notificarRechazoYCancelar(String pedidoId, String motivoRechazo);
 
+    /**
+     * Aprueba el pago y descuenta del stock los productos del pedido.
+     */
     void actualizarInventario(String pedidoId);
 
     /**
-     * Descuenta del stock los productos del pedido, una vez aprobado el pago.
+     * Registra en la API el comprobante de pago adjuntado por el cliente.
      */
     void subirComprobante(String pedidoId, String nombreArchivo, String rutaArchivo, String observacion);
 }
