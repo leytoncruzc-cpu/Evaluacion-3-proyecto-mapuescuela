@@ -86,13 +86,13 @@
     <sequenceFlow id="f11" sourceRef="task_preparar_pedido" targetRef="gw_modalidad"/>
 
     <sequenceFlow id="f12" sourceRef="gw_modalidad" targetRef="task_listo_retiro">
-      <conditionExpression xsi:type="tFormalExpression">${modalidadEntrega == 'retiro'}</conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression">${modalidadEntrega == 'RETIRO'}</conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="f13" sourceRef="task_listo_retiro" targetRef="task_registrar_retiro"/>
     <sequenceFlow id="f14" sourceRef="task_registrar_retiro" targetRef="end_finalizado_retiro"/>
 
     <sequenceFlow id="f15" sourceRef="gw_modalidad" targetRef="task_registrar_despacho">
-      <conditionExpression xsi:type="tFormalExpression">${modalidadEntrega == 'despacho'}</conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression">${modalidadEntrega == 'DESPACHO'}</conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="f16" sourceRef="task_registrar_despacho" targetRef="task_confirmar_entrega"/>
     <sequenceFlow id="f17" sourceRef="task_confirmar_entrega" targetRef="end_finalizado_despacho"/>
